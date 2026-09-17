@@ -1,0 +1,169 @@
+{
+  "id": "2d3f6315-1390-4fce-a66e-ff6c7985cfd3",
+  "title": "TableBlocks",
+  "status": "Planned",
+  "sliceType": "STATE_VIEW",
+  "chapter": "Day7",
+  "context": "Day7",
+  "commands": [],
+  "events": [],
+  "readmodels": [
+    {
+      "id": "b2000001-0000-4000-8000-000000000203",
+      "title": "TableBlocks",
+      "type": "READMODEL",
+      "lane": "Interaction",
+      "slice": "TableBlocks",
+      "apiEndpoint": "day7_table_blocks",
+      "listElement": true,
+      "description": "",
+      "fields": [
+        {
+          "name": "tableNumber",
+          "type": "String",
+          "optional": false,
+          "query": true,
+          "idAttribute": true,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "TableBlocked.tableNumber - the blocked table"
+        },
+        {
+          "name": "date",
+          "type": "String",
+          "optional": false,
+          "query": true,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "TableBlocked.date - blocks are per table per service day"
+        },
+        {
+          "name": "startTime",
+          "type": "String",
+          "optional": false,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "TableBlocked.startTime"
+        },
+        {
+          "name": "endTime",
+          "type": "String",
+          "optional": false,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "TableBlocked.endTime"
+        },
+        {
+          "name": "reason",
+          "type": "String",
+          "optional": false,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "TableBlocked.reason - shown to the host so they know why"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "type": "INBOUND",
+          "title": "TableBlocked",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "b2000001-0000-4000-8000-000000000302",
+          "type": "OUTBOUND",
+          "elementType": "HTML_SCREEN"
+        }
+      ],
+      "comments": []
+    }
+  ],
+  "screens": [
+    {
+      "id": "b2000001-0000-4000-8000-000000000302",
+      "title": "",
+      "type": "HTML_SCREEN",
+      "lane": "Actor",
+      "slice": "TableBlocks",
+      "fields": []
+    }
+  ],
+  "processors": [],
+  "tables": [],
+  "specifications": [
+    {
+      "id": "e1000001-0000-4000-8000-000000000006",
+      "title": "Show the blocks on a table for a service day",
+      "expectEmptyList": false,
+      "given": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "title": "TableBlocked",
+          "type": "EVENT",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "e2000001-0000-4000-8000-000000000001",
+          "title": "Blocks for a table on a date",
+          "type": "QUERY",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"}
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000203",
+          "title": "TableBlocks",
+          "type": "READMODEL",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e1000001-0000-4000-8000-000000000007",
+      "title": "A table with no blocks shows an empty list",
+      "expectEmptyList": true,
+      "given": [],
+      "when": [
+        {
+          "id": "e2000001-0000-4000-8000-000000000002",
+          "title": "Blocks for a table on a date",
+          "type": "QUERY",
+          "expectEmptyList": true,
+          "fields": [
+            {"name": "tableNumber", "example": "7"},
+            {"name": "date", "example": "15.04.2026"}
+          ]
+        }
+      ],
+      "then": []
+    }
+  ],
+  "actors": [],
+  "aggregates": [],
+  "screenImages": [],
+  "comments": []
+}
