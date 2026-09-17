@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { getSupabase } from './supabase';
 
 /**
  * Common API client — the ONLY place that knows about base URLs, auth headers,
@@ -28,7 +28,7 @@ export function activeMockSample(): string {
 async function getAuthHeaders(): Promise<Record<string, string>> {
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await getSupabase().auth.getSession();
 
   return {
     'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export async function queryReadModel<T>(
     return sample;
   }
 
-  let query = supabase.from(params.table).select(params.select);
+  let query = getSupabase().from(params.table).select(params.select);
   for (const [column, value] of Object.entries(params.filters ?? {})) {
     query = query.eq(column, value);
   }

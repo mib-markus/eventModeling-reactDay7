@@ -1,0 +1,338 @@
+{
+  "id": "4b1abbf6-4021-49ce-85bc-708dacf4b806",
+  "title": "BlockTable",
+  "status": "Planned",
+  "sliceType": "STATE_CHANGE",
+  "chapter": "Day7",
+  "context": "Day7",
+  "commands": [
+    {
+      "id": "b2000001-0000-4000-8000-000000000201",
+      "title": "BlockTable",
+      "type": "COMMAND",
+      "lane": "Interaction",
+      "slice": "BlockTable",
+      "apiEndpoint": "/api/day7/blocktable/:tableNumber",
+      "description": "",
+      "fields": [
+        {
+          "name": "tableNumber",
+          "type": "String",
+          "optional": false,
+          "idAttribute": true,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "host input - the table being taken out of service"
+        },
+        {
+          "name": "date",
+          "type": "String",
+          "optional": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "host input - the service day the block applies to"
+        },
+        {
+          "name": "startTime",
+          "type": "String",
+          "optional": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "host input - when the block begins"
+        },
+        {
+          "name": "endTime",
+          "type": "String",
+          "optional": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "host input - when the block ends"
+        },
+        {
+          "name": "reason",
+          "type": "String",
+          "optional": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "host input - maintenance, private event, etc."
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "type": "OUTBOUND",
+          "title": "TableBlocked",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "b2000001-0000-4000-8000-000000000301",
+          "type": "INBOUND",
+          "elementType": "HTML_SCREEN"
+        }
+      ],
+      "comments": []
+    }
+  ],
+  "events": [
+    {
+      "id": "b2000001-0000-4000-8000-000000000202",
+      "title": "TableBlocked",
+      "type": "EVENT",
+      "lane": "Swimlane",
+      "slice": "BlockTable",
+      "createsAggregate": true,
+      "fields": [
+        {"name": "tableNumber", "type": "String", "optional": false, "idAttribute": true, "mapping": "BlockTable.tableNumber"},
+        {"name": "date", "type": "String", "optional": false, "mapping": "BlockTable.date"},
+        {"name": "startTime", "type": "String", "optional": false, "mapping": "BlockTable.startTime"},
+        {"name": "endTime", "type": "String", "optional": false, "mapping": "BlockTable.endTime"},
+        {"name": "reason", "type": "String", "optional": false, "mapping": "BlockTable.reason"}
+      ]
+    }
+  ],
+  "readmodels": [],
+  "screens": [
+    {
+      "id": "b2000001-0000-4000-8000-000000000301",
+      "title": "",
+      "type": "HTML_SCREEN",
+      "lane": "Actor",
+      "slice": "BlockTable",
+      "fields": []
+    }
+  ],
+  "processors": [],
+  "tables": [],
+  "specifications": [
+    {
+      "id": "e1000001-0000-4000-8000-000000000001",
+      "title": "Block a free table for a private event",
+      "given": [],
+      "when": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000201",
+          "title": "BlockTable",
+          "type": "COMMAND",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "title": "TableBlocked",
+          "type": "EVENT",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e1000001-0000-4000-8000-000000000002",
+      "title": "Block a table outside the hours an existing reservation holds it",
+      "given": [
+        {
+          "id": "a1000001-0000-4000-8000-000000000109",
+          "title": "ReservationConfirmed",
+          "type": "EVENT",
+          "fields": [
+            {"name": "reservationCode", "example": "R-7K2Q"},
+            {"name": "tableNumber", "example": "12"},
+            {"name": "eMail", "example": "max.mustermann@gmx.de"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "19:00"},
+            {"name": "endTime", "example": "21:00"}
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000201",
+          "title": "BlockTable",
+          "type": "COMMAND",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Maintenance"}
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "title": "TableBlocked",
+          "type": "EVENT",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Maintenance"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e1000001-0000-4000-8000-000000000003",
+      "title": "Reject blocking a table that an active reservation holds at an overlapping time",
+      "given": [
+        {
+          "id": "a1000001-0000-4000-8000-000000000109",
+          "title": "ReservationConfirmed",
+          "type": "EVENT",
+          "fields": [
+            {"name": "reservationCode", "example": "R-7K2Q"},
+            {"name": "tableNumber", "example": "12"},
+            {"name": "eMail", "example": "max.mustermann@gmx.de"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "19:00"},
+            {"name": "endTime", "example": "21:00"}
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000201",
+          "title": "BlockTable",
+          "type": "COMMAND",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "20:00"},
+            {"name": "endTime", "example": "22:00"},
+            {"name": "reason", "example": "Maintenance"}
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "363c3c87-d1c0-45eb-8224-f7eabe868146",
+          "title": "Reject blocking a table that an active reservation holds at an overlapping time",
+          "description": "Table 12 is held by an active reservation between 19:00 and 21:00 on 15.04.2026, so it cannot be blocked at an overlapping time. Only tables with no active reservation can be blocked.",
+          "type": "SPEC_ERROR",
+          "fields": []
+        }
+      ]
+    },
+    {
+      "id": "e1000001-0000-4000-8000-000000000004",
+      "title": "Block a table whose only reservation was cancelled",
+      "given": [
+        {
+          "id": "a1000001-0000-4000-8000-000000000109",
+          "title": "ReservationConfirmed",
+          "type": "EVENT",
+          "fields": [
+            {"name": "reservationCode", "example": "R-7K2Q"},
+            {"name": "tableNumber", "example": "12"},
+            {"name": "eMail", "example": "max.mustermann@gmx.de"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "19:00"},
+            {"name": "endTime", "example": "21:00"}
+          ]
+        },
+        {
+          "id": "a1000001-0000-4000-8000-000000000113",
+          "title": "ReservationCancelled",
+          "type": "EVENT",
+          "fields": [
+            {"name": "reservationCode", "example": "R-7K2Q"},
+            {"name": "eMail", "example": "max.mustermann@gmx.de"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "19:00"},
+            {"name": "tableNumber", "example": "12"}
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000201",
+          "title": "BlockTable",
+          "type": "COMMAND",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "19:00"},
+            {"name": "endTime", "example": "21:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "title": "TableBlocked",
+          "type": "EVENT",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "19:00"},
+            {"name": "endTime", "example": "21:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e1000001-0000-4000-8000-000000000005",
+      "title": "Reject blocking the same table twice at an overlapping time",
+      "given": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "title": "TableBlocked",
+          "type": "EVENT",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "14:00"},
+            {"name": "endTime", "example": "17:00"},
+            {"name": "reason", "example": "Private event"}
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "b2000001-0000-4000-8000-000000000201",
+          "title": "BlockTable",
+          "type": "COMMAND",
+          "fields": [
+            {"name": "tableNumber", "example": "12"},
+            {"name": "date", "example": "15.04.2026"},
+            {"name": "startTime", "example": "16:00"},
+            {"name": "endTime", "example": "18:00"},
+            {"name": "reason", "example": "Maintenance"}
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "1ef8db55-9e68-45e8-a9a9-67146321f622",
+          "title": "Reject blocking the same table twice at an overlapping time",
+          "description": "Table 12 is already blocked between 14:00 and 17:00 on 15.04.2026, so it cannot be blocked again at an overlapping time.",
+          "type": "SPEC_ERROR",
+          "fields": []
+        }
+      ]
+    }
+  ],
+  "actors": [],
+  "aggregates": [],
+  "screenImages": [],
+  "comments": []
+}
