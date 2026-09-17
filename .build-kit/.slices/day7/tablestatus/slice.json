@@ -1,0 +1,239 @@
+{
+  "id": "232e001a-b1b5-422e-8bc9-5afab77d7f9e",
+  "title": "TableStatus",
+  "status": "Done",
+  "sliceType": "STATE_VIEW",
+  "chapter": "Day7",
+  "context": "Day7",
+  "commands": [],
+  "events": [],
+  "readmodels": [
+    {
+      "id": "a1000001-0000-4000-8000-000000000110",
+      "title": "TableStatus",
+      "type": "READMODEL",
+      "lane": "Interaction",
+      "slice": "TableStatus",
+      "apiEndpoint": "day7_table_status",
+      "listElement": true,
+      "description": "",
+      "fields": [
+        {
+          "name": "tableNumber",
+          "type": "String",
+          "optional": false,
+          "query": true,
+          "idAttribute": true,
+          "cardinality": "Single",
+          "subfields": [],
+          "example": "12",
+          "mapping": "ReservationConfirmed.tableNumber - the table this row is about"
+        },
+        {
+          "name": "date",
+          "type": "String",
+          "optional": false,
+          "query": true,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "example": "15.04.2026",
+          "mapping": "ReservationConfirmed.date - status is per table per service day"
+        },
+        {
+          "name": "reservationCode",
+          "type": "String",
+          "optional": true,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "example": "R-7K2Q",
+          "mapping": "ReservationConfirmed.reservationCode - cleared when the reservation is cancelled"
+        },
+        {
+          "name": "startTime",
+          "type": "String",
+          "optional": true,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "example": "19:00",
+          "mapping": "ReservationConfirmed.startTime"
+        },
+        {
+          "name": "endTime",
+          "type": "String",
+          "optional": true,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "example": "21:00",
+          "mapping": "ReservationConfirmed.endTime"
+        },
+        {
+          "name": "numberOfPeople",
+          "type": "String",
+          "optional": true,
+          "query": false,
+          "idAttribute": false,
+          "cardinality": "Single",
+          "subfields": [],
+          "example": "4",
+          "mapping": "ReservationPlaced.numberOfPeople - the party the table is held for"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "a1000001-0000-4000-8000-000000000109",
+          "type": "INBOUND",
+          "title": "ReservationConfirmed",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "a1000001-0000-4000-8000-000000000113",
+          "type": "INBOUND",
+          "title": "ReservationCancelled",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "b2000001-0000-4000-8000-000000000207",
+          "type": "INBOUND",
+          "title": "ReservationReleasedAsNoShow",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "b2000001-0000-4000-8000-000000000202",
+          "type": "INBOUND",
+          "title": "TableBlocked",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "871ca6ad-f821-4373-a912-2d5c23a2de1d",
+          "type": "OUTBOUND",
+          "elementType": "HTML_SCREEN"
+        },
+        {
+          "id": "ee5eea87-eaa4-4fbf-acd7-9b43276ee417",
+          "type": "OUTBOUND",
+          "elementType": "HTML_SCREEN"
+        }
+      ],
+      "comments": []
+    }
+  ],
+  "screens": [
+    {
+      "id": "871ca6ad-f821-4373-a912-2d5c23a2de1d",
+      "title": "",
+      "type": "HTML_SCREEN",
+      "lane": "Actor",
+      "slice": "TableStatus",
+      "fields": []
+    }
+  ],
+  "processors": [],
+  "tables": [],
+  "specifications": [
+    {
+      "id": "ab000006-0000-4000-8000-000000000001",
+      "title": "A confirmed reservation holds its table",
+      "expectEmptyList": false,
+      "examples": [
+        {
+          "date": "15.04.2026",
+          "endTime": "21:00",
+          "startTime": "19:00",
+          "tableNumber": "12",
+          "numberOfPeople": "4",
+          "reservationCode": "R-7K2Q"
+        }
+      ],
+      "given": [
+        {"id": "a1000001-0000-4000-8000-000000000102", "title": "ReservationPlaced", "type": "EVENT", "fields": []},
+        {"id": "a1000001-0000-4000-8000-000000000109", "title": "ReservationConfirmed", "type": "EVENT", "fields": []}
+      ],
+      "when": [
+        {
+          "id": "bc000006-0000-4000-8000-000000000001",
+          "title": "TableStatusQuery",
+          "type": "QUERY",
+          "fields": [{"name": "date", "example": "15.04.2026"}]
+        }
+      ],
+      "then": [
+        {"id": "a1000001-0000-4000-8000-000000000110", "title": "TableStatus", "type": "READMODEL", "fields": []}
+      ]
+    },
+    {
+      "id": "ab000006-0000-4000-8000-000000000002",
+      "title": "An unconfirmed reservation holds no table",
+      "expectEmptyList": true,
+      "examples": [{"date": "15.04.2026"}],
+      "given": [
+        {"id": "a1000001-0000-4000-8000-000000000102", "title": "ReservationPlaced", "type": "EVENT", "fields": [], "expectEmptyList": true}
+      ],
+      "when": [
+        {
+          "id": "bc000006-0000-4000-8000-000000000002",
+          "title": "TableStatusQuery",
+          "type": "QUERY",
+          "expectEmptyList": true,
+          "fields": [{"name": "date", "example": "15.04.2026"}]
+        }
+      ],
+      "then": [
+        {"id": "a1000001-0000-4000-8000-000000000110", "title": "TableStatus", "type": "READMODEL", "fields": [], "expectEmptyList": true}
+      ]
+    },
+    {
+      "id": "ab000006-0000-4000-8000-000000000003",
+      "title": "Cancelling frees the table again",
+      "expectEmptyList": true,
+      "examples": [{"date": "15.04.2026", "tableNumber": "12"}],
+      "given": [
+        {"id": "a1000001-0000-4000-8000-000000000102", "title": "ReservationPlaced", "type": "EVENT", "fields": [], "expectEmptyList": true},
+        {"id": "a1000001-0000-4000-8000-000000000109", "title": "ReservationConfirmed", "type": "EVENT", "fields": [], "expectEmptyList": true},
+        {"id": "a1000001-0000-4000-8000-000000000113", "title": "ReservationCancelled", "type": "EVENT", "fields": [], "expectEmptyList": true}
+      ],
+      "when": [
+        {
+          "id": "bc000006-0000-4000-8000-000000000003",
+          "title": "TableStatusQuery",
+          "type": "QUERY",
+          "expectEmptyList": true,
+          "fields": [{"name": "date", "example": "15.04.2026"}]
+        }
+      ],
+      "then": [
+        {"id": "a1000001-0000-4000-8000-000000000110", "title": "TableStatus", "type": "READMODEL", "fields": [], "expectEmptyList": true}
+      ]
+    }
+  ],
+  "actors": [],
+  "aggregates": [],
+  "screenImages": [],
+  "comments": [],
+  "storylines": [
+    {
+      "id": "cd000001-0000-4000-8000-000000000001",
+      "title": "Life of table 12 on 15.04.2026",
+      "elements": [
+        {"id": "a1000001-0000-4000-8000-000000000110", "title": "Table 12 is free — nothing booked yet", "type": "READMODEL", "expectEmptyList": true},
+        {"id": "a1000001-0000-4000-8000-000000000101", "title": "A guest books 19:00–21:00 for 4", "type": "COMMAND", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000102", "title": "ReservationPlaced — but still no table", "type": "EVENT", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000110", "title": "Table 12 is still free — placing does not hold a table", "type": "READMODEL", "expectEmptyList": true},
+        {"id": "a1000001-0000-4000-8000-000000000107", "title": "The reservation appears on the staff to-confirm list", "type": "READMODEL", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000108", "title": "Staff assign table 12", "type": "COMMAND", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000108", "title": "Alternative: table 12 is already held at an overlapping time — rejected", "type": "COMMAND", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000109", "title": "ReservationConfirmed on table 12", "type": "EVENT", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000110", "title": "Table 12 now reads Held — R-7K2Q, 19:00–21:00", "type": "READMODEL", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000112", "title": "The guest cancels, more than 2h before 19:00", "type": "COMMAND", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000113", "title": "ReservationCancelled — table 12 carried along", "type": "EVENT", "expectEmptyList": false},
+        {"id": "a1000001-0000-4000-8000-000000000116", "title": "Table 12 is free again — ready for another party", "type": "READMODEL", "expectEmptyList": true}
+      ]
+    }
+  ]
+}

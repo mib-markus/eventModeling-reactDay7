@@ -1,0 +1,26 @@
+[
+  {
+    "tableNumber": "7",
+    "date": "15.04.2026",
+    "reservationCode": "R-3M8B",
+    "startTime": "12:00",
+    "endTime": "14:00",
+    "numberOfPeople": "2"
+  },
+  {
+    "tableNumber": "12",
+    "date": "15.04.2026",
+    "reservationCode": "BLOCK-12-15.04.2026-14:00-17:00",
+    "startTime": "14:00",
+    "endTime": "17:00",
+    "numberOfPeople": null
+  },
+  {
+    "tableNumber": "15",
+    "date": "15.04.2026",
+    "reservationCode": "R-9QW4",
+    "startTime": "19:00",
+    "endTime": "21:00",
+    "numberOfPeople": "6"
+  }
+]
