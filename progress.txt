@@ -190,3 +190,76 @@
     exists, use it as the structural blueprint even without live board/mark access — no need to
     fall back to a fields-only design once `pages` is present.
 ---
+
+## 2026-09-18 - ClockIn (rebuild)
+
+- Started iteration: context "timetracking" (Time Tracking). ClockIn (index 1) was the only
+  Planned slice — reverted by the same revert commit (8a1de17) that sent MyShifts back for
+  rebuild, for the same reason: the earlier build (e77e03e) predates `pages` being patched into
+  `clockin/slice.json`, so it stacked ClockIn as its own standalone `<section>` instead of
+  composing it into the shared "My shifts" page with MyShifts. MyShifts itself was already
+  rebuilt and Done from the prior iteration.
+- No `.build-kit/.eventmodelers/config.json` and `.eventmodelers/config.json` still has only
+  `agentIds.BUILD` -> skipped all board sync, consistent with every prior iteration.
+- Branched `feature/clockin` from `main` (confirmed `day9` is an ancestor of `main`, so `main` has
+  everything).
+- Set slice status to InProgress in index.json and slice.json.
+- `clockin/slice.json`'s screen entry's `pages` markup is the **whole** "My shifts" page (`<h1>My
+  shifts</h1>` + subtitle + the shift table + a `<div class="box">` with Location/Terminal inputs
+  and a "Clock in" button) — same page markup MyShifts's own slice.json carries for its half, just
+  without `marks` (neither `myshifts` nor `clockin` slice.json has a `marks` array, so there's no
+  `data-em-mark-id` to split on programmatically) — split it manually by comparing both slices'
+  markup: MyShifts's `pages[0]` ends right after `</table>` with no box; ClockIn's `pages[0]` has
+  the identical table plus the box+button. So ClockIn owns the box+button fragment, MyShifts owns
+  the table fragment, and the shared `<h1>`/subtitle belongs to neither slice individually — it's
+  the page's own chrome.
+- Rebuilt `ClockIn.tsx` to return only the `<div class="box">` fragment (Location/Terminal fields +
+  Clock in button), dropping the old `<section><h1>Clock in</h1>...` wrapper the pre-revert version
+  had invented. Props still exactly `command.fields[]` (employeeId, shiftId, clockedInAt?,
+  location?, terminal?) plus `onSuccess`/`onError` — `shiftId` is now typed `string | null` since
+  the page passes MyShifts's live selection (which is `null` before any clockable shift is picked),
+  and the button is disabled whenever it's `null` in addition to the existing `submitting` check.
+  Endpoint `/api/day9/clockin/:employeeId` unchanged (apiEndpoint verbatim).
+- Edited `MyShifts.tsx` (from the already-Done MyShifts slice) two ways to make this composition
+  possible: (1) dropped its own `<section><container><h1>My shifts</h1><subtitle>...` wrapper —
+  it now returns just the loading/error/empty/table fragment in a `<>...</>` — since that chrome
+  is shared with ClockIn's half of the same page and duplicating it would show two headings; (2)
+  added an optional `onSelectionChange?: (shiftId: string | null) => void` prop, called from a
+  `useEffect` whenever `effectiveSelectedShiftId` changes, so a parent page can read the live
+  selection without MyShifts importing anything from ClockIn's slice folder.
+- Created `src/pages/MyShifts.tsx` (`MyShiftsPage`) — the first page composition in this project.
+  Holds the shared `<h1>My shifts</h1>`/subtitle chrome plus a `useState<string | null>` for the
+  selected shift, renders `MyShiftsView` (aliased import) with `onSelectionChange` wired to that
+  state, then `ClockIn` with `shiftId={selectedShiftId}`. Neither slice component imports from the
+  other's folder — only this page does, per the "only src/pages/ may cross slice folders" rule.
+- Rewired `App.tsx`: replaced the standalone `<MyShifts .../>` with `<MyShiftsPage
+  employeeId=... at=... />`; removed the now-unused direct `MyShifts` import.
+- Reused the pre-revert samples verbatim (sample-1: location+terminal; sample-2: neither) since
+  the command fields didn't change, just the component's own JSX shape.
+- Left the four rejection specifications (shift_not_active x2, not_assigned_to_shift,
+  already_clocked_in) as backend invariants surfaced through the standard ApiError/onError path,
+  same as the pre-revert build and same as CreateShift's precedent — none of the needed state
+  (shift timing, assignment, existing open session) is available to the component via props.
+- Verified visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock, sample-1): the
+  composed page shows one "My shifts" heading, the shift table with its radio pre-checked on
+  early-shift, and the Location/Terminal box with "Kitchen entrance"/"TERM-02" pre-filled directly
+  beneath it — matching the full `pages` markup structurally. Clicked "Clock in"; resolved via mock
+  `postCommand` with no console errors.
+- npm run build and npm run lint both pass clean.
+- Committed as "feat: [ClockIn]" and fast-forward merged into main.
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config).
+- **Learnings for future iterations:**
+  - When two sibling slices' `screens[].pages` share one screen title but neither slice.json has a
+    `marks` array, there's no `data-em-mark-id` to split the markup programmatically — instead
+    diff each slice's own `pages[0]` against the other's: the common prefix (up to where one
+    slice's markup ends and the other's continues with additional markup) is shared page chrome,
+    and each slice owns the fragment that's uniquely present in its own copy.
+  - A composed page's shared heading/subtitle belongs to the page component itself, not to either
+    contributing slice's component — each slice component should return only its own inner
+    fragment (wrap in `<>...</>` if it needs no wrapper element) once a page composition exists,
+    so the page owns the chrome exactly once.
+  - Cross-slice-component coordination on a composed page (one component's selection feeding a
+    sibling's prop) is threaded through the page via a plain `onSelectionChange` callback prop plus
+    a `useState` the page itself owns — not a shared Context and not a cross-slice import. See the
+    updated `.build-kit/AGENTS.md` entry for the general pattern.
+---

@@ -5,6 +5,8 @@ export interface MyShiftsProps {
   employeeId: string;
   /** The moment to evaluate `clockable` against — normally "now". */
   at: string;
+  /** Notified whenever the selected shift changes — lets a parent page wire ClockIn to it. */
+  onSelectionChange?: (shiftId: string | null) => void;
 }
 
 interface Shift {
@@ -30,7 +32,7 @@ const samplesByNumber = Object.fromEntries(
 const formatDateTime = (value: string) => value.replace('T', ' ');
 const formatTime = (value: string) => value.slice(value.indexOf('T') + 1);
 
-export function MyShifts({ employeeId, at }: MyShiftsProps) {
+export function MyShifts({ employeeId, at, onSelectionChange }: MyShiftsProps) {
   const queryKey = `${employeeId}|${at}`;
   const [result, setResult] = useState<{
     queryKey: string;
@@ -75,66 +77,64 @@ export function MyShifts({ employeeId, at }: MyShiftsProps) {
       ? selectedShiftId
       : shifts.find((shift) => shift.clockable)?.shiftId ?? null;
 
+  useEffect(() => {
+    onSelectionChange?.(effectiveSelectedShiftId);
+  }, [effectiveSelectedShiftId, onSelectionChange]);
+
   return (
-    <section className="section">
-      <div className="container">
-        <h1 className="title">My shifts</h1>
-        <p className="subtitle is-6 has-text-grey">
-          Pick the shift you are starting. Clock in opens 15 minutes before the shift begins.
-        </p>
-        {loading && <p className="has-text-grey">Loading your shifts…</p>}
-        {!loading && error && (
-          <div className="notification is-danger is-light" role="alert">
-            {error}
-          </div>
-        )}
-        {!loading && !error && shifts.length === 0 && (
-          <p className="has-text-grey">You have no assigned shifts.</p>
-        )}
-        {!loading && !error && shifts.length > 0 && (
-          <table className="table is-fullwidth is-striped">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Shift</th>
-                <th>Type</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Clock in opens</th>
+    <>
+      {loading && <p className="has-text-grey">Loading your shifts…</p>}
+      {!loading && error && (
+        <div className="notification is-danger is-light" role="alert">
+          {error}
+        </div>
+      )}
+      {!loading && !error && shifts.length === 0 && (
+        <p className="has-text-grey">You have no assigned shifts.</p>
+      )}
+      {!loading && !error && shifts.length > 0 && (
+        <table className="table is-fullwidth is-striped">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Shift</th>
+              <th>Type</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Clock in opens</th>
+            </tr>
+          </thead>
+          <tbody>
+            {shifts.map((shift) => (
+              <tr
+                key={shift.shiftId}
+                className={shift.shiftId === effectiveSelectedShiftId ? 'is-selected' : undefined}
+              >
+                <td>
+                  <input
+                    type="radio"
+                    name="selected-shift"
+                    checked={shift.shiftId === effectiveSelectedShiftId}
+                    disabled={!shift.clockable}
+                    onChange={() => setSelectedShiftId(shift.shiftId)}
+                  />
+                </td>
+                <td>{shift.name}</td>
+                <td>{shift.type}</td>
+                <td>{formatDateTime(shift.startDateTime)}</td>
+                <td>{formatDateTime(shift.endDateTime)}</td>
+                <td>
+                  {shift.clockable ? (
+                    formatTime(shift.clockInOpensAt)
+                  ) : (
+                    <span className="tag is-light">not yet</span>
+                  )}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {shifts.map((shift) => (
-                <tr
-                  key={shift.shiftId}
-                  className={shift.shiftId === effectiveSelectedShiftId ? 'is-selected' : undefined}
-                >
-                  <td>
-                    <input
-                      type="radio"
-                      name="selected-shift"
-                      checked={shift.shiftId === effectiveSelectedShiftId}
-                      disabled={!shift.clockable}
-                      onChange={() => setSelectedShiftId(shift.shiftId)}
-                    />
-                  </td>
-                  <td>{shift.name}</td>
-                  <td>{shift.type}</td>
-                  <td>{formatDateTime(shift.startDateTime)}</td>
-                  <td>{formatDateTime(shift.endDateTime)}</td>
-                  <td>
-                    {shift.clockable ? (
-                      formatTime(shift.clockInOpensAt)
-                    ) : (
-                      <span className="tag is-light">not yet</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </section>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </>
   );
 }

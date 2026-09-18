@@ -49,3 +49,12 @@
 - Vite only reads `.env` once at process startup — changing `VITE_MOCK_SAMPLE` (or any `VITE_*` var)
   requires restarting `npm run dev`, not just reloading the browser, for the new value to take
   effect during manual/Playwright verification.
+- When composing a shared page (Step 6/5 of build-state-change/build-state-view) where one slice's
+  component selects something (e.g. MyShifts' shift radio-select) and a sibling slice's component
+  needs that selection (ClockIn's `shiftId` prop), thread it through the page, not a cross-slice
+  import or a shared Context: give the upstream component an `onSelectionChange?: (id) => void`
+  prop, have the page hold the resulting `useState` itself, and pass it down as the sibling's own
+  prop. Each slice component still only knows its own declared props — the page is the only place
+  that knows both exist. Also move each contributing slice's own page-level chrome (the shared
+  `<h1>`/subtitle) up into the page component and have each slice's own component return just its
+  fragment (table, box, etc.) — otherwise the composed page ends up with duplicate headings.
