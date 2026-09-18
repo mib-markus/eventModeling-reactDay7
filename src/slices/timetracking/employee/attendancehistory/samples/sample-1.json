@@ -1,0 +1,11 @@
+[
+  {
+    "entryId": "b1a2c3d4-5e6f-4789-9abc-1234567890ab",
+    "shiftId": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581",
+    "shiftName": "early-shift",
+    "clockedInAt": "2026-04-15T06:00",
+    "clockedOutAt": "2026-04-15T14:00",
+    "hoursWorked": 8,
+    "monthHoursWorked": 8
+  }
+]
