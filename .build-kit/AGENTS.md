@@ -79,3 +79,13 @@
   (touches no slice folder, passes trivially), the new slice's own `feat:` commit (its files +
   the page composition), and a `refactor:` commit for the sibling's signature change alone. Run
   `npm run run:checks` after staging each batch to confirm before committing.
+- Before assuming a screen needs `src/pages/` composition, check whether its title is actually
+  shared: `grep -l '"title": *"<ScreenTitle>"' .build-kit/.slices/*/index.json` should show the
+  title appearing in more than this one slice's own definition. A context can have multiple
+  screens that only look similar (e.g. "My shifts" vs. "My attendance" in Time Tracking) — a
+  screen with no sibling slice on the same title stays a plain standalone component wired directly
+  into `App.tsx`, same treatment as the very first slices before any page composition existed.
+- When a read model field's `mapping` says a value is the same across every row (e.g. a
+  pre-aggregated total like `monthHoursWorked`), read it off any single returned row instead of
+  re-deriving or summing it client-side — the read model/backend already did that aggregation; the
+  component's job is just to display it.
