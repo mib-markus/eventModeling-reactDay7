@@ -5,20 +5,30 @@
   Per the ralph loop instructions, treat this as "config absent" and skip all board communication
   (screen HTML fetch, `update-slice-status`, comments) rather than running the `connect` skill's
   interactive setup mid-iteration.
-- When a screen node can't be fetched (no board access), fall back to building the form from
-  `slice.json` fields alone, matching the visual/markup conventions already used by sibling
+- **`slice.json.screens[].pages` holds the screen markup — use it, never redesign.** The slicedata
+  API omits `pages` (just as it omits `apiEndpoint`), so it is patched into `slice.json` by hand.
+  Board access is therefore *not* required to follow the visual blueprint. Only if a screen entry
+  has no `pages` key at all may you fall back to building from `fields` alone, matching sibling
   components in `src/slices/<context>/...` (Bulma `section`/`container`/`columns`/`field`/`control`
   classes, inline notification for errors — see `src/slices/day7/actor/blocktable/BlockTable.tsx`).
+- Translate that markup structurally: every control in it must survive into the JSX (an
+  `<input type="radio">` per row means the list needs real selection state, not a read-only table),
+  column headers keep their names, and headings or subtitles absent from the markup are not invented.
 - `slice.json.screens[].lane` gives the lane segment for the file path directly
   (`src/slices/<contextSlug>/<laneSlug>/<sliceFolder>/`) without needing a board outline call —
   useful when the board isn't reachable.
 - `DateTime` typed fields with `YYYY-MM-DDTHH:mm` examples map cleanly to `<input type="datetime-local">`.
-- When several slices' screens share one `title` (build-state-change/build-state-view's page
-  composition step) but the board isn't reachable, don't guess at `src/pages/<Title>.tsx` markup —
-  build each slice's component standalone from its own `slice.json` and wire it into `App.tsx`
-  directly, same as every other slice so far. Revisit page composition once board access exists.
+- When several slices' screens share one `title`, they belong on **one** page at
+  `src/pages/<Title>.tsx`, per `.build-kit/CLAUDE.md` guideline 7 — not stacked as separate
+  full-width `<section>`s in `App.tsx`. Each sharing slice's own `pages` markup shows that slice's
+  portion of the shared screen; compose the page from the common parts and substitute each slice's
+  component where its markup differs. `App.tsx` then renders the page, not the individual slices.
+  (The Time Tracking "My shifts" screen is the worked example: MyShifts owns the shift table,
+  ClockIn the Location/Terminal box beneath it.)
 - A read model's Boolean `clockable`/held-style field maps well to a Bulma `tag is-success`/`is-light`
-  pair (see `TableStatus.tsx`'s held/free tags and `MyShifts.tsx`'s clockable tag).
+  pair (see `TableStatus.tsx`'s held/free tags) — but only when the screen markup actually shows a
+  tag there. Check `pages` first: the "My shifts" markup wants a literal `Clock in opens` time with
+  a `not yet` tag only for the unavailable rows, not a blanket status tag on every row.
 - Branch new slice work from `main`, not an older per-day branch (`day8`/`day9`/...) — those
   branches can predate later merges from sibling slices, so branching from one risks losing code
   that's already on `main`.

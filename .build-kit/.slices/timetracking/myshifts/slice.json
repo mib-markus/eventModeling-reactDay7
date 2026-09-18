@@ -1,7 +1,7 @@
 {
   "id": "234fd3b9-050b-43e4-8797-91b936870dac",
   "title": "MyShifts",
-  "status": "Done",
+  "status": "Planned",
   "sliceType": "STATE_VIEW",
   "chapter": "Time Tracking",
   "context": "Time Tracking",
@@ -200,7 +200,10 @@
       "createsAggregate": false,
       "elementCopy": false,
       "sketched": false,
-      "comments": []
+      "comments": [],
+      "pages": [
+        "<section class=\"section\"><div class=\"container\"><h1 class=\"title\">My shifts</h1><p class=\"subtitle is-6 has-text-grey\">Pick the shift you are starting. Clock in opens 15 minutes before the shift begins.</p><table class=\"table is-fullwidth is-striped\"><thead><tr><th></th><th>Shift</th><th>Type</th><th>Start</th><th>End</th><th>Clock in opens</th></tr></thead><tbody><tr class=\"is-selected\"><td><input type=\"radio\" checked /></td><td>early-shift</td><td>kitchen</td><td>2026-04-15 06:00</td><td>2026-04-15 14:00</td><td>05:45</td></tr><tr><td><input type=\"radio\" disabled /></td><td>late-shift</td><td>kitchen</td><td>2026-04-15 14:00</td><td>2026-04-15 22:00</td><td><span class=\"tag is-light\">not yet</span></td></tr></tbody></table></div></section>"
+      ]
     }
   ],
   "processors": [],

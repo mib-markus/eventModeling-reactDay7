@@ -1,7 +1,7 @@
 {
   "id": "2f2c3441-9158-4157-9118-98ac1e3d2bf3",
   "title": "ClockIn",
-  "status": "Done",
+  "status": "Planned",
   "sliceType": "STATE_CHANGE",
   "chapter": "Time Tracking",
   "context": "Time Tracking",
@@ -260,7 +260,10 @@
       "createsAggregate": false,
       "elementCopy": false,
       "sketched": false,
-      "comments": []
+      "comments": [],
+      "pages": [
+        "<section class=\"section\"><div class=\"container\"><h1 class=\"title\">My shifts</h1><p class=\"subtitle is-6 has-text-grey\">Pick the shift you are starting. Clock in opens 15 minutes before the shift begins.</p><table class=\"table is-fullwidth is-striped\"><thead><tr><th></th><th>Shift</th><th>Type</th><th>Start</th><th>End</th><th>Clock in opens</th></tr></thead><tbody><tr class=\"is-selected\"><td><input type=\"radio\" checked /></td><td>early-shift</td><td>kitchen</td><td>2026-04-15 06:00</td><td>2026-04-15 14:00</td><td>05:45</td></tr></tbody></table><div class=\"box\"><div class=\"columns\"><div class=\"column\"><div class=\"field\"><label class=\"label\">Location</label><div class=\"control\"><input class=\"input\" type=\"text\" value=\"Kitchen entrance\" /></div></div></div><div class=\"column\"><div class=\"field\"><label class=\"label\">Terminal</label><div class=\"control\"><input class=\"input\" type=\"text\" value=\"TERM-02\" /></div></div></div></div><div class=\"field\"><div class=\"control\"><button class=\"button is-primary is-fullwidth\">Clock in</button></div></div></div></div></section>"
+      ]
     }
   ],
   "processors": [],
