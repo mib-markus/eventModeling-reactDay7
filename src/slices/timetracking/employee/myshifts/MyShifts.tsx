@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { queryReadModel } from '../../../../lib/api';
 
+export interface SelectedShift {
+  shiftId: string;
+  name: string;
+}
+
 export interface MyShiftsProps {
   employeeId: string;
   /** The moment to evaluate `clockable` against — normally "now". */
   at: string;
   /** Notified whenever the selected shift changes — lets a parent page wire ClockIn to it. */
-  onSelectionChange?: (shiftId: string | null) => void;
+  onSelectionChange?: (shift: SelectedShift | null) => void;
 }
 
 interface Shift {
@@ -76,10 +81,16 @@ export function MyShifts({ employeeId, at, onSelectionChange }: MyShiftsProps) {
     selectedShiftId && shifts.some((shift) => shift.shiftId === selectedShiftId && shift.clockable)
       ? selectedShiftId
       : shifts.find((shift) => shift.clockable)?.shiftId ?? null;
+  const effectiveSelectedShift =
+    shifts.find((shift) => shift.shiftId === effectiveSelectedShiftId) ?? null;
 
   useEffect(() => {
-    onSelectionChange?.(effectiveSelectedShiftId);
-  }, [effectiveSelectedShiftId, onSelectionChange]);
+    onSelectionChange?.(
+      effectiveSelectedShift
+        ? { shiftId: effectiveSelectedShift.shiftId, name: effectiveSelectedShift.name }
+        : null,
+    );
+  }, [effectiveSelectedShift, onSelectionChange]);
 
   return (
     <>
