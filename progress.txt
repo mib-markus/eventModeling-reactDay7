@@ -42,3 +42,45 @@
   - datetime-local `<input>` is the natural fit for `DateTime` typed fields with `YYYY-MM-DDTHH:mm`
     examples (matches slice.json's example format exactly, e.g. "2026-04-15T06:00").
 ---
+
+## 2026-09-18 - MyShifts
+
+- Started iteration: context switched to "timetracking" (Time Tracking); highest-priority Planned
+  slice was MyShifts (STATE_VIEW, index 0). ClockIn (index 1) also Planned but lower priority, left
+  untouched. ClockOut/AttendanceHistory are still "Created" (not yet Planned) — correctly ignored.
+- No `.build-kit/.eventmodelers/config.json` and `.eventmodelers/config.json` only has
+  `agentIds.BUILD` (no token/boardId/organizationId) -> skipped all board sync
+  (update-slice-status/comments/screen fetch), same as prior CreateShift iteration.
+- Created branch feature/myshifts from day9.
+- Set slice status to InProgress in index.json and slice.json.
+- Screen "My shifts" title is shared across MyShifts/ClockIn/ClockOut slices in
+  .build-kit/.slices/timetracking/index.json, which per build-state-view Step 5 would normally mean
+  composing at src/pages/My shifts.tsx — but with no board token the actual screen markup/marks
+  can't be fetched, so (consistent with the CreateShift precedent) built the standalone component
+  from slice.json fields alone and wired it directly into App.tsx. Revisit page composition once a
+  board token is configured and the real screen mockup is reachable.
+- Built src/slices/timetracking/employee/myshifts/MyShifts.tsx (lane "Employee" from
+  slice.json screens[].lane). Renders a table of employeeId's assigned shifts (name, type, start,
+  end, clockable tag), loading/error/empty states, queries `day9_my_shifts` (readmodel.apiEndpoint
+  verbatim) via queryReadModel with an explicit column select (camelCase alias : snake_case column,
+  matching the TableStatus/TableBlocks convention already in this codebase).
+- Added 3 numbered samples covering the 3 specifications: sample-1 (clockable inside grace period),
+  sample-2 (same shift, not yet clockable), sample-3 (empty list - not assigned to any shift).
+- Wired MyShifts into App.tsx with sample-1's employeeId/at values.
+- Verified visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock): sample-1 shows
+  "early-shift"/"kitchen" tagged Clockable; switching VITE_MOCK_SAMPLE=3 renders the "You have no
+  assigned shifts" empty state. Confirms loading/empty/data paths all work.
+- npm run build and npm run lint both pass clean.
+- Committed as "feat: [MyShifts]" and fast-forward merged into main (via day9 -> main FF).
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config).
+- **Learnings for future iterations:**
+  - Same as CreateShift: `.eventmodelers/config.json` in this project has no token — treat this as
+    the permanent state of this project for now, not something to fix mid-iteration.
+  - When a screen title is shared across multiple slices (per build-state-view Step 5 / CLAUDE.md
+    guideline 7) but no board token exists to fetch the real markup/marks, don't attempt
+    src/pages/<Title>.tsx composition from guesswork — build each slice's component standalone from
+    its own slice.json and wire it directly, same as this and the CreateShift iteration did. Revisit
+    once board access exists.
+  - `clockable` (Boolean type) renders well as a Bulma `tag is-success`/`is-light` pair, following
+    the same held/free tag pattern TableStatus already uses.
+---

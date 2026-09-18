@@ -1,0 +1,480 @@
+{
+  "id": "5829430f-4eb0-4e9c-a05a-dbc43d2fcf2e",
+  "title": "AttendanceHistory",
+  "status": "Created",
+  "sliceType": "STATE_VIEW",
+  "chapter": "Time Tracking",
+  "context": "Time Tracking",
+  "commands": [],
+  "events": [],
+  "readmodels": [
+    {
+      "id": "f7065b6a-a458-4964-9720-ed7f6def7e41",
+      "title": "AttendanceHistory",
+      "type": "READMODEL",
+      "fields": [
+        {
+          "name": "employeeId",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": true,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "UUID",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ClockedIn.employeeId - the signed-in employee, an employee only sees their own history"
+        },
+        {
+          "name": "month",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": true,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "String",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "the month of ClockedIn.clockedInAt - defaults to the current month"
+        },
+        {
+          "name": "entryId",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": true,
+          "type": "UUID",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "one row per ClockedIn"
+        },
+        {
+          "name": "shiftId",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "UUID",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ClockedIn.shiftId"
+        },
+        {
+          "name": "shiftName",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "String",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ShiftCreated.name"
+        },
+        {
+          "name": "clockedInAt",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "DateTime",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ClockedIn.clockedInAt"
+        },
+        {
+          "name": "clockedOutAt",
+          "optional": true,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "DateTime",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ClockedOut.clockedOutAt - absent while the entry is still open"
+        },
+        {
+          "name": "hoursWorked",
+          "optional": true,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "Double",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "clockedOutAt minus clockedInAt in hours - absent while the entry is still open"
+        },
+        {
+          "name": "monthHoursWorked",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "Double",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "sum of hoursWorked across every closed entry in the queried month - same on every row"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+          "type": "INBOUND",
+          "title": "ShiftCreated",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "7a4730fe-d6f0-4073-ab08-a1392960d4bc",
+          "type": "INBOUND",
+          "title": "ClockedIn",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "bee8a781-d2b1-424b-962b-8f8d6516fa8f",
+          "type": "INBOUND",
+          "title": "ClockedOut",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "a96ed901-82de-4870-b99f-9b850a607c5f",
+          "type": "OUTBOUND",
+          "title": "My attendance",
+          "elementType": "HTML_SCREEN"
+        }
+      ],
+      "modelContext": "Time Tracking",
+      "lane": "Interaction",
+      "aggregate": "default",
+      "aggregateDependencies": [],
+      "triggers": [],
+      "tags": [],
+      "slice": "AttendanceHistory",
+      "description": "An employee's own attendance history - one row per clock in, with the matching clock out when there is one, plus the hours worked. Scoped to the signed-in employee and filtered to one month, so the page can show the current month's total. A row with no clockedOutAt is a still-open or forgotten clock out.",
+      "context": "INTERNAL",
+      "elementContext": "INTERNAL",
+      "listElement": true,
+      "todoList": false,
+      "createsAggregate": false,
+      "elementCopy": false,
+      "sketched": false,
+      "comments": [],
+      "apiEndpoint": "day9_attendance_history"
+    }
+  ],
+  "screens": [
+    {
+      "id": "a96ed901-82de-4870-b99f-9b850a607c5f",
+      "title": "My attendance",
+      "type": "HTML_SCREEN",
+      "fields": [],
+      "dependencies": [
+        {
+          "id": "f7065b6a-a458-4964-9720-ed7f6def7e41",
+          "type": "INBOUND",
+          "title": "AttendanceHistory",
+          "elementType": "READMODEL"
+        }
+      ],
+      "modelContext": "Time Tracking",
+      "lane": "Employee",
+      "aggregate": "default",
+      "aggregateDependencies": [],
+      "triggers": [],
+      "tags": [],
+      "slice": "AttendanceHistory",
+      "description": "",
+      "context": "INTERNAL",
+      "elementContext": "INTERNAL",
+      "listElement": false,
+      "todoList": false,
+      "createsAggregate": false,
+      "elementCopy": false,
+      "sketched": false,
+      "comments": []
+    }
+  ],
+  "processors": [],
+  "tables": [],
+  "specifications": [
+    {
+      "id": "b4d7ffd4-7198-4d34-9a82-3850ecc84fe3",
+      "title": "a closed entry shows the hours worked and counts towards the month total",
+      "chapter": "Time Tracking",
+      "sliceName": "AttendanceHistory",
+      "vertical": false,
+      "expectEmptyList": false,
+      "examples": [],
+      "given": [
+        {
+          "id": "9c1e904d-2cda-48b4-a275-e4b9ba214a3a",
+          "title": "ShiftCreated",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            }
+          ]
+        },
+        {
+          "id": "7a4730fe-d6f0-4073-ab08-a1392960d4bc",
+          "title": "ClockedIn",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "clockedInAt",
+              "example": "2026-04-15T06:00"
+            }
+          ]
+        },
+        {
+          "id": "bee8a781-d2b1-424b-962b-8f8d6516fa8f",
+          "title": "ClockedOut",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "clockedOutAt",
+              "example": "2026-04-15T14:00"
+            }
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "75152a71-dfb6-493c-b385-758dbc55739c",
+          "title": "AttendanceHistory",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "QUERY",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "month",
+              "example": "2026-04"
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "f7065b6a-a458-4964-9720-ed7f6def7e41",
+          "title": "AttendanceHistory",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "READMODEL",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "shiftName",
+              "example": "early-shift"
+            },
+            {
+              "name": "clockedInAt",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "clockedOutAt",
+              "example": "2026-04-15T14:00"
+            },
+            {
+              "name": "hoursWorked",
+              "example": "8"
+            },
+            {
+              "name": "monthHoursWorked",
+              "example": "8"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ae926d36-8fd3-4950-8de9-eab4e1f93bc7",
+      "title": "an entry with no clock out shows no hours and is excluded from the month total",
+      "chapter": "Time Tracking",
+      "sliceName": "AttendanceHistory",
+      "vertical": false,
+      "expectEmptyList": false,
+      "examples": [],
+      "given": [
+        {
+          "id": "9c1e904d-2cda-48b4-a275-e4b9ba214a3a",
+          "title": "ShiftCreated",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            }
+          ]
+        },
+        {
+          "id": "7a4730fe-d6f0-4073-ab08-a1392960d4bc",
+          "title": "ClockedIn",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "clockedInAt",
+              "example": "2026-04-15T06:00"
+            }
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "fdf20b51-d28e-4a2e-9b49-1f5f04239287",
+          "title": "AttendanceHistory",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "QUERY",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "month",
+              "example": "2026-04"
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "f7065b6a-a458-4964-9720-ed7f6def7e41",
+          "title": "AttendanceHistory",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "READMODEL",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "shiftName",
+              "example": "early-shift"
+            },
+            {
+              "name": "clockedInAt",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "monthHoursWorked",
+              "example": "0"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actors": [],
+  "aggregates": [],
+  "screenImages": [],
+  "comments": []
+}

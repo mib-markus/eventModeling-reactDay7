@@ -13,3 +13,9 @@
   (`src/slices/<contextSlug>/<laneSlug>/<sliceFolder>/`) without needing a board outline call —
   useful when the board isn't reachable.
 - `DateTime` typed fields with `YYYY-MM-DDTHH:mm` examples map cleanly to `<input type="datetime-local">`.
+- When several slices' screens share one `title` (build-state-change/build-state-view's page
+  composition step) but the board isn't reachable, don't guess at `src/pages/<Title>.tsx` markup —
+  build each slice's component standalone from its own `slice.json` and wire it into `App.tsx`
+  directly, same as every other slice so far. Revisit page composition once board access exists.
+- A read model's Boolean `clockable`/held-style field maps well to a Bulma `tag is-success`/`is-light`
+  pair (see `TableStatus.tsx`'s held/free tags and `MyShifts.tsx`'s clockable tag).

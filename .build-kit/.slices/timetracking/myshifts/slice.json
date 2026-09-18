@@ -1,0 +1,546 @@
+{
+  "id": "234fd3b9-050b-43e4-8797-91b936870dac",
+  "title": "MyShifts",
+  "status": "Done",
+  "sliceType": "STATE_VIEW",
+  "chapter": "Time Tracking",
+  "context": "Time Tracking",
+  "commands": [],
+  "events": [],
+  "readmodels": [
+    {
+      "id": "686e29b2-b335-446a-a8c8-683da082b344",
+      "title": "MyShifts",
+      "type": "READMODEL",
+      "fields": [
+        {
+          "name": "employeeId",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": true,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "UUID",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "EmployeeAssignedToShift.employeeId - the signed-in employee"
+        },
+        {
+          "name": "shiftId",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": true,
+          "type": "UUID",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "EmployeeAssignedToShift.shiftId"
+        },
+        {
+          "name": "name",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "String",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ShiftCreated.name"
+        },
+        {
+          "name": "type",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "String",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ShiftCreated.type"
+        },
+        {
+          "name": "startDateTime",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "DateTime",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ShiftCreated.startDateTime"
+        },
+        {
+          "name": "endDateTime",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "DateTime",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ShiftCreated.endDateTime"
+        },
+        {
+          "name": "clockInOpensAt",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "DateTime",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "ShiftCreated.startDateTime minus the 15 minute grace period"
+        },
+        {
+          "name": "clockable",
+          "optional": false,
+          "showAttributes": false,
+          "technicalAttribute": false,
+          "query": false,
+          "generated": false,
+          "edited": false,
+          "idAttribute": false,
+          "type": "Boolean",
+          "cardinality": "Single",
+          "subfields": [],
+          "mapping": "true when the queried moment falls between clockInOpensAt and endDateTime - drives whether the shift is selectable in the UI"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+          "type": "INBOUND",
+          "title": "ShiftCreated",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "d9493a32-20f4-4d42-989c-56a5fa47a90a",
+          "type": "INBOUND",
+          "title": "EmployeeAssignedToShift",
+          "elementType": "EVENT"
+        },
+        {
+          "id": "c9b6021a-860c-4024-9f43-1891f259d6af",
+          "type": "OUTBOUND",
+          "title": "My shifts",
+          "elementType": "HTML_SCREEN"
+        },
+        {
+          "id": "b78fb198-980e-44c7-9a6a-ba3941155f5d",
+          "type": "OUTBOUND",
+          "title": "My shifts",
+          "elementType": "HTML_SCREEN"
+        }
+      ],
+      "modelContext": "Time Tracking",
+      "lane": "Interaction",
+      "aggregate": "default",
+      "aggregateDependencies": [],
+      "triggers": [],
+      "tags": [],
+      "slice": "MyShifts",
+      "description": "The shifts this employee is assigned to, with the flag that says whether each one can be clocked into right now. A shift is clockable from 15 minutes before its startDateTime until its endDateTime. The employee picks one of these before issuing ClockIn.",
+      "context": "INTERNAL",
+      "elementContext": "INTERNAL",
+      "listElement": true,
+      "todoList": false,
+      "createsAggregate": false,
+      "elementCopy": false,
+      "sketched": false,
+      "comments": [],
+      "apiEndpoint": "day9_my_shifts"
+    }
+  ],
+  "screens": [
+    {
+      "id": "c9b6021a-860c-4024-9f43-1891f259d6af",
+      "title": "My shifts",
+      "type": "HTML_SCREEN",
+      "fields": [],
+      "dependencies": [
+        {
+          "id": "686e29b2-b335-446a-a8c8-683da082b344",
+          "type": "INBOUND",
+          "title": "MyShifts",
+          "elementType": "READMODEL"
+        }
+      ],
+      "modelContext": "Time Tracking",
+      "lane": "Employee",
+      "aggregate": "default",
+      "aggregateDependencies": [],
+      "triggers": [],
+      "tags": [],
+      "slice": "MyShifts",
+      "description": "",
+      "context": "INTERNAL",
+      "elementContext": "INTERNAL",
+      "listElement": false,
+      "todoList": false,
+      "createsAggregate": false,
+      "elementCopy": false,
+      "sketched": false,
+      "comments": []
+    }
+  ],
+  "processors": [],
+  "tables": [],
+  "specifications": [
+    {
+      "id": "de7fe714-cf84-4c8d-85d1-0d487731b794",
+      "title": "an assigned shift is clockable inside the 15 minute grace period",
+      "chapter": "Time Tracking",
+      "sliceName": "MyShifts",
+      "vertical": false,
+      "expectEmptyList": false,
+      "examples": [],
+      "given": [
+        {
+          "id": "9c1e904d-2cda-48b4-a275-e4b9ba214a3a",
+          "title": "ShiftCreated",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            }
+          ]
+        },
+        {
+          "id": "ad51fecd-a477-46a1-bdb9-683b52c8a18b",
+          "title": "EmployeeAssignedToShift",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            }
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "3ef27a19-78cf-4750-ac29-1565493e58a7",
+          "title": "MyShifts",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "QUERY",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "at",
+              "example": "2026-04-15T05:50"
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "686e29b2-b335-446a-a8c8-683da082b344",
+          "title": "MyShifts",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "READMODEL",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            },
+            {
+              "name": "clockInOpensAt",
+              "example": "2026-04-15T05:45"
+            },
+            {
+              "name": "clockable",
+              "example": "true"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b384d52a-821f-4540-836f-ada1ca83e758",
+      "title": "the same shift is not clockable before the grace period opens",
+      "chapter": "Time Tracking",
+      "sliceName": "MyShifts",
+      "vertical": false,
+      "expectEmptyList": false,
+      "examples": [],
+      "given": [
+        {
+          "id": "9c1e904d-2cda-48b4-a275-e4b9ba214a3a",
+          "title": "ShiftCreated",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            }
+          ]
+        },
+        {
+          "id": "ad51fecd-a477-46a1-bdb9-683b52c8a18b",
+          "title": "EmployeeAssignedToShift",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            }
+          ]
+        }
+      ],
+      "when": [
+        {
+          "id": "4b5d5255-a299-4aff-a085-93fb4e36ce2e",
+          "title": "MyShifts",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "QUERY",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "at",
+              "example": "2026-04-15T05:30"
+            }
+          ]
+        }
+      ],
+      "then": [
+        {
+          "id": "686e29b2-b335-446a-a8c8-683da082b344",
+          "title": "MyShifts",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "READMODEL",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            },
+            {
+              "name": "clockInOpensAt",
+              "example": "2026-04-15T05:45"
+            },
+            {
+              "name": "clockable",
+              "example": "false"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c954de79-f9c9-4734-8303-20f0c275b6e5",
+      "title": "a shift the employee is not assigned to is not listed",
+      "chapter": "Time Tracking",
+      "sliceName": "MyShifts",
+      "vertical": false,
+      "expectEmptyList": true,
+      "examples": [],
+      "given": [
+        {
+          "id": "9c1e904d-2cda-48b4-a275-e4b9ba214a3a",
+          "title": "ShiftCreated",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "name",
+              "example": "early-shift"
+            },
+            {
+              "name": "type",
+              "example": "kitchen"
+            },
+            {
+              "name": "startDateTime",
+              "example": "2026-04-15T06:00"
+            },
+            {
+              "name": "endDateTime",
+              "example": "2026-04-15T14:00"
+            }
+          ],
+          "expectEmptyList": true
+        },
+        {
+          "id": "ad51fecd-a477-46a1-bdb9-683b52c8a18b",
+          "title": "EmployeeAssignedToShift",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "EVENT",
+          "fields": [
+            {
+              "name": "shiftId",
+              "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+            },
+            {
+              "name": "employeeId",
+              "example": "9d41c7b8-6e25-4a03-812f-5b70de94a1c3"
+            }
+          ],
+          "expectEmptyList": true
+        }
+      ],
+      "when": [
+        {
+          "id": "033c0fa2-a6d8-45d0-a774-9455263449dc",
+          "title": "MyShifts",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "QUERY",
+          "fields": [
+            {
+              "name": "employeeId",
+              "example": "5f2a8c31-7b64-4e08-a91d-3c05f7ba2e69"
+            },
+            {
+              "name": "at",
+              "example": "2026-04-15T05:50"
+            }
+          ],
+          "expectEmptyList": true
+        }
+      ],
+      "then": [
+        {
+          "id": "686e29b2-b335-446a-a8c8-683da082b344",
+          "title": "MyShifts",
+          "tags": [],
+          "index": 0,
+          "specRow": 0,
+          "type": "READMODEL",
+          "fields": [],
+          "expectEmptyList": true
+        }
+      ]
+    }
+  ],
+  "actors": [],
+  "aggregates": [],
+  "screenImages": [],
+  "comments": []
+}
