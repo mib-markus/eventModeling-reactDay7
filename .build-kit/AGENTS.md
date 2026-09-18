@@ -19,3 +19,12 @@
   directly, same as every other slice so far. Revisit page composition once board access exists.
 - A read model's Boolean `clockable`/held-style field maps well to a Bulma `tag is-success`/`is-light`
   pair (see `TableStatus.tsx`'s held/free tags and `MyShifts.tsx`'s clockable tag).
+- Branch new slice work from `main`, not an older per-day branch (`day8`/`day9`/...) — those
+  branches can predate later merges from sibling slices, so branching from one risks losing code
+  that's already on `main`.
+- Not every `SPEC_ERROR` specification is client-side validation. Only validate inline what the
+  command's own `fields[]` already carry (e.g. CreateShift's recurring/fromDay/toDay,
+  start-before-end). When a rejection depends on state the component was never given — shift
+  timing, assignment records, an existing open session — that's a backend invariant; let it surface
+  through the standard `ApiError`/`onError` path instead of having the component fetch data just to
+  replicate a check the backend already owns.

@@ -84,3 +84,51 @@
   - `clockable` (Boolean type) renders well as a Bulma `tag is-success`/`is-light` pair, following
     the same held/free tag pattern TableStatus already uses.
 ---
+
+## 2026-09-18 - ClockIn
+
+- Started iteration: context "timetracking" (Time Tracking); highest-priority Planned slice was
+  ClockIn (STATE_CHANGE, index 1). MyShifts (index 0) already Done; ClockOut/AttendanceHistory
+  still "Created" — correctly left untouched.
+- No `.build-kit/.eventmodelers/config.json` and `.eventmodelers/config.json` still has only
+  `agentIds.BUILD` (no token/boardId/organizationId) -> skipped all board sync
+  (update-slice-status/comments/screen fetch), same as CreateShift/MyShifts iterations.
+- Branched `feature/clockin` from `main` (not `day9` — `day9` predates the MyShifts merge, so
+  branching from `main` picks up the latest slice code instead of missing it).
+- Set slice status to InProgress in index.json and slice.json.
+- Screen "My shifts" is shared with MyShifts (Done) and ClockOut (still Created, not yet built) —
+  per build-state-change Step 6 that would normally mean composing at src/pages/My shifts.tsx, but
+  with no board token the real screen markup/marks still can't be fetched. Consistent with the
+  documented precedent, built ClockIn.tsx standalone from slice.json fields alone and wired it
+  directly into App.tsx.
+- Built src/slices/timetracking/employee/clockin/ClockIn.tsx (lane "Employee" from
+  slice.json screens[].lane). Props are exactly command.fields[]: employeeId, shiftId,
+  clockedInAt (optional override, defaults to now), location (optional), terminal (optional).
+  POSTs to `/api/day9/clockin/:employeeId` (apiEndpoint verbatim, employeeId interpolated into the
+  path like CreateShift's `:shiftId`).
+- The four rejection specifications (shift_not_active x2, not_assigned_to_shift,
+  already_clocked_in) all depend on state ClockIn's command fields don't carry (shift timing,
+  assignment, existing open ClockedIn) — the component has no way to validate them client-side
+  without fetching data itself, which slice components must never do. Left these as backend
+  invariants surfaced generically through the existing ApiError/onError path, same treatment
+  CreateShift gave its server-side "shift_already_created" duplicate check.
+- Added samples/sample-1.json (location+terminal, from spec 1) and samples/sample-2.json (no
+  location/terminal, from spec 2 — "without location or terminal is allowed"). Wired sample-1 into
+  App.tsx.
+- Verified visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock): form renders with
+  sample-1's location/terminal pre-filled, clicking "Clock in" resolves via mock postCommand with
+  no error notification.
+- npm run build and npm run lint both pass clean.
+- Committed as "feat: [ClockIn]" and fast-forward merged into main.
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config).
+- **Learnings for future iterations:**
+  - When branching for a new slice, prefer branching from `main`, not an older per-day branch like
+    `day9` — day branches can predate later merges (day9 was missing the MyShifts commit already on
+    main), so branching from an old day branch risks losing sibling slices' code.
+  - A command's rejection specifications aren't automatically client-side validation candidates —
+    only implement inline validation when the needed data is actually among the command's own
+    fields (e.g. CreateShift's recurring/fromDay/toDay). When a rejection depends on server-side
+    state the component was never given (shift timing, assignment, existing sessions), it's a
+    backend invariant: let it surface through the standard ApiError/onError path instead of
+    inventing a client-side check that would require the component to fetch data itself.
+---

@@ -1,7 +1,7 @@
 {
   "id": "2f2c3441-9158-4157-9118-98ac1e3d2bf3",
   "title": "ClockIn",
-  "status": "Planned",
+  "status": "Done",
   "sliceType": "STATE_CHANGE",
   "chapter": "Time Tracking",
   "context": "Time Tracking",
