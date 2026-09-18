@@ -2,8 +2,28 @@
 
 Every `*.cjs` file in this folder is loaded and run automatically by
 `../check-commit-scope.cjs` against the staged changeset of a slice commit
-(a commit that touches `src/slices/{context}/{slice}/**`). Files run in
+(a commit that touches `src/slices/{context}/{lane}/{slice}/**`). Files run in
 filename sort order — that's why they're numbered.
+
+A slice folder in this stack is **three** segments deep, not two: a screen's
+actor lane becomes a path segment (see `.build-kit/CLAUDE.md` guideline 8). Any
+check that matches slice paths itself must account for that — a two-segment
+pattern copied from a backend stack matches nothing here and silently passes
+every commit.
+
+Installed via `git config core.hooksPath .githooks`; run them by hand against
+your current work with `npm run run:checks` (add `-- --staged` to check only
+what's staged, matching what the hook itself checks).
+
+## What the current checks enforce
+
+| check | enforces |
+|---|---|
+| `00-blocked-paths` | slice work never touches package manifests, `src/lib/api.ts`, `src/lib/supabase.ts`, or `src/main.tsx` |
+| `10-slice-scope` | everything staged is in one slice's folder, or is `src/pages/<Screen>.tsx` / `src/App.tsx` |
+| `30-samples-present` | a changed component ships at least one `samples/sample-<N>.json` (guideline 9 — mock-mode testability) |
+| `40-no-invented-fields` | heuristic: a data interface declares no field absent from slice.json (`*Props` excluded — props are wiring, not payload) |
+| `90-build-lint` | `tsc -b --noEmit` and `oxlint` both still pass |
 
 ## Adding a check
 
@@ -22,7 +42,7 @@ module.exports = {
     // Inspect ctx and return an array of violations. No violations → return
     // [] (or undefined/null).
     return [
-      { path: 'src/slices/cart/AddItem/AddItemCommand.ts', reason: 'why this is a problem' },
+      { path: 'src/slices/cart/customer/additem/AddItem.tsx', reason: 'why this is a problem' },
     ];
   },
 };
@@ -34,8 +54,8 @@ module.exports = {
 |-----------------|-----------------|-----------------------------------------------------------------------|
 | `changes`       | `{status, path}[]` | staged files — `status` is git's single-letter code (`A`/`M`/`D`/...) |
 | `touchesSlice`  | `boolean`       | always `true` — the runner only loads checks once this is true        |
-| `repoRoot`      | `string`        | absolute path to the repo root (`git rev-parse --show-toplevel`)       |
-| `SLICE_PATTERN` | `RegExp`        | matches a path inside a slice's own folder: `src/slices/{ctx}/{slice}/`|
+| `repoRoot`      | `string`        | absolute path to this project's own root (`process.cwd()`)            |
+| `SLICE_PATTERN` | `RegExp`        | matches a path inside a slice's own folder: `src/slices/{ctx}/{lane}/{slice}/` |
 
 ### Return value
 

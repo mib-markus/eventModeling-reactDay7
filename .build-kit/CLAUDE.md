@@ -122,6 +122,19 @@ When asked to build a slice, always follow this flow:
 
 After you are done, automatically run the tests for the slice that was edited.
 
+## Commit Scope Guard
+
+A pre-commit hook (`.githooks/pre-commit`, installed via `git config core.hooksPath .githooks`)
+runs `.build-kit/lib/check-commit-scope.cjs` on every commit that touches
+`src/slices/{context}/{lane}/{slice}/`. It loads every check under `.build-kit/lib/checks/`
+and rejects the commit if any of them find a problem — see that folder's README.md for the
+current list and what each one enforces.
+
+If a commit is rejected, split it — commit the out-of-scope file separately from the slice work,
+or add the missing sample/fix the field — rather than passing `--no-verify`. Run
+`npm run run:checks` any time you want to check your current work (by default this checks every
+uncommitted change; pass `-- --staged` to check only what's staged, matching the hook).
+
 ## Example Slice Structure
 
 ```
