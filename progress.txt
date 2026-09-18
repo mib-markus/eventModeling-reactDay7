@@ -274,3 +274,57 @@
   `agentIds.BUILD` -> skipped all board sync, consistent with every prior iteration.
 - Branched `feature/clockout` from `main`.
 - Set slice status to InProgress in index.json and slice.json.
+- Invoked `build-state-change` skill for ClockOut (STATE_CHANGE). Screen "My shifts" is shared
+  with MyShifts/ClockIn (same screen title, no `marks` array in clockout/slice.json either) — its
+  `pages` markup shows the "Clocked in on **early-shift** since 05:52." info notification plus a
+  Location/Terminal box with a red "Clock out" button, replacing MyShifts' picker table and
+  ClockIn's box once an employee has clocked in.
+- Built `ClockOut.tsx` mirroring ClockIn's shape exactly: props are `command.fields[]`
+  (employeeId, clockedOutAt?, location?, terminal?) plus onSuccess/onError, POSTs to
+  `/api/day9/clockout/:employeeId` (apiEndpoint verbatim), same Bulma box/columns/field/control
+  markup and `is-danger is-fullwidth` button per the mockup.
+- The "Clocked in on <name> since <time>" banner is **not** a ClockOut command field — it's derived
+  from which shift MyShifts had selected and when ClockIn succeeded, so it lives in the page
+  component (`src/pages/MyShifts.tsx`), not inside ClockOut.tsx. Extended `MyShifts.tsx`'s
+  `onSelectionChange` to carry `{shiftId, name}` instead of a bare id (new exported `SelectedShift`
+  type) so the page has the shift's name without ClockOut needing to fetch or own it.
+  `MyShiftsPage` now holds an `openSession` state (set from ClockIn's `onSuccess`, cleared from
+  ClockOut's `onSuccess`) that toggles between the picker+ClockIn pair and the
+  notification+ClockOut pair — same "page owns cross-component coordination via callback props"
+  pattern as the ClockIn iteration's shift-selection wiring.
+- Left the four rejection specifications (not_clocked_in x2, clock_out_before_clock_in) as backend
+  invariants surfaced through the standard ApiError/onError path — same precedent as ClockIn's own
+  four rejections, none of the needed state (an existing open ClockedIn) is available to the
+  component via props.
+- Added `samples/sample-1.json` (location+terminal, from spec 1) and `samples/sample-2.json`
+  (neither, from the "clock in again" spec's second clock-out).
+- Verified the full round trip visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock,
+  sample-1): picker+ClockIn renders first: clicking "Clock in" switches the page to the
+  "Clocked in on early-shift since 05:50." banner with the Location/Terminal ClockOut box beneath
+  it; clicking "Clock out" reverts to the picker. No console errors either direction.
+- npm run build and npm run lint both pass clean.
+- **Commit-scope guard note**: this is the first slice built since the guard (`ebede65`) was
+  installed, and it caught something real — MyShifts.tsx needed a genuine signature change
+  (`onSelectionChange` payload shape) to support ClockOut's page composition, which the guard
+  correctly flags as a cross-slice edit in one commit. Split into three scoped commits instead of
+  `--no-verify`: (1) board metadata (index.json/slice.json status flips) + progress.txt — touches
+  no slice folder, passes trivially; (2) `feat: [ClockOut]` — the new slice's own files plus
+  `src/pages/MyShifts.tsx` (a documented exception, guideline 7); (3) a separate `refactor:` commit
+  for the MyShifts.tsx signature change alone, since the guard scopes strictly one slice folder per
+  commit and page-composition edits don't exempt a sibling slice's own component file.
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config).
+- Fast-forward merged `feature/clockout` into `main`, deleted the branch.
+- **Learnings for future iterations:**
+  - When a shared-page composition (Step 6 of build-state-change/build-state-view) requires
+    widening an already-built sibling slice's own prop/callback shape (not just wiring it — an
+    actual signature change to that sibling's `.tsx`), the commit-scope guard forces that into its
+    own commit, separate from both the new slice's `feat:` commit and any board-metadata commit.
+    Plan for up to three commits per iteration once cross-slice coordination is needed: metadata,
+    the new slice + page composition, and the sibling's own signature change.
+  - Not every notification/banner shown on a composed page belongs to the command whose success
+    triggered it — "Clocked in on X since Y" is ClockOut's screen mockup content, but it's built
+    from *ClockIn's* outcome (which shift, what time), not from any of ClockOut's own
+    `command.fields[]`. That derived, cross-component display state belongs in the page component,
+    the same place that already owns the `openSession`/`selectedShift` coordination — never invented
+    as an extra prop on the command component whose fields don't back it.
+---

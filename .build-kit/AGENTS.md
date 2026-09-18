@@ -58,3 +58,24 @@
   that knows both exist. Also move each contributing slice's own page-level chrome (the shared
   `<h1>`/subtitle) up into the page component and have each slice's own component return just its
   fragment (table, box, etc.) — otherwise the composed page ends up with duplicate headings.
+- A composed page can toggle between two whole slice-pairs, not just one component's inner view:
+  ClockOut's mockup replaces MyShifts' picker+ClockIn box entirely with a notification+ClockOut box
+  once the employee has an open session. Model that as one piece of state the page owns (e.g.
+  `openSession`, set from the upstream command's `onSuccess`, cleared from the downstream command's
+  own `onSuccess`) gating which pair of components renders — same "page owns cross-component
+  coordination via callback props" pattern, just switching two whole fragments instead of one value.
+- Not every string a screen's mockup shows for a command belongs to that command's own
+  `command.fields[]`. A banner like "Clocked in on <shiftname> since <time>" reads as ClockOut
+  screen content but is actually derived from a *different* command's outcome (ClockIn: which
+  shift, what time) — never invent it as an extra prop on the component whose fields don't back it;
+  it belongs in the page component alongside whatever other cross-component state that page already
+  coordinates.
+- **The commit-scope guard (`.build-kit/lib/check-commit-scope.cjs`, installed via
+  `.githooks/pre-commit`) scopes exactly one slice folder per commit.** If a shared-page composition
+  requires an actual signature change to an already-built sibling slice's own `.tsx` (not just
+  wiring — e.g. widening a callback's payload shape), that change cannot ride in the same commit as
+  the new slice's `feat:` commit even though `src/pages/<Screen>.tsx` itself is an allowed
+  exception. Split into separate commits instead of `--no-verify`: board-metadata/progress.txt
+  (touches no slice folder, passes trivially), the new slice's own `feat:` commit (its files +
+  the page composition), and a `refactor:` commit for the sibling's signature change alone. Run
+  `npm run run:checks` after staging each batch to confirm before committing.
