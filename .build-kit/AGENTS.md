@@ -38,3 +38,14 @@
   timing, assignment records, an existing open session — that's a backend invariant; let it surface
   through the standard `ApiError`/`onError` path instead of having the component fetch data just to
   replicate a check the backend already owns.
+- `screens[].pages` markup implies state structurally, not just visually — an `<input
+  type="radio">` per row means the component needs real selection state (e.g. a
+  `selectedX`/`effectiveSelectedX` pair), not a read-only render of each row's own flag. Match the
+  interaction pattern the markup shows, not just how it looks.
+- Prefer deriving a "selected by default" value during render (state falling back to a computed
+  default expression) over `setState` inside a `useEffect` for the same purpose — oxlint's
+  `react(set-state-in-effect)` rule flags the latter as an unnecessary extra render, and the former
+  is simpler besides.
+- Vite only reads `.env` once at process startup — changing `VITE_MOCK_SAMPLE` (or any `VITE_*` var)
+  requires restarting `npm run dev`, not just reloading the browser, for the new value to take
+  effect during manual/Playwright verification.

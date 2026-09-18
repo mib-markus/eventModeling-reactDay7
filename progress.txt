@@ -132,3 +132,61 @@
     backend invariant: let it surface through the standard ApiError/onError path instead of
     inventing a client-side check that would require the component to fetch data itself.
 ---
+
+## 2026-09-18 - MyShifts (rebuild)
+
+- Started iteration: context "timetracking" (Time Tracking). A prior commit (8a1de17) had reverted
+  MyShifts and ClockIn back to Planned status: the earlier build was done before `screens[].pages`
+  markup was patched into slice.json by hand, so it invented its own layout (a passive status
+  table) instead of the real one (a radio-select table with a "Clock in opens" column). MyShifts
+  (index 0) was the highest-priority Planned slice; ClockIn (index 1) was left untouched for a
+  separate iteration.
+- No `.build-kit/.eventmodelers/config.json` and `.eventmodelers/config.json` still has only
+  `agentIds.BUILD` (no token/boardId/organizationId) -> skipped all board sync
+  (update-slice-status/comments/screen fetch), consistent with every prior iteration.
+- Branched `feature/myshifts` from `day9` (day9 already contains everything on `main` plus the
+  timetracking context; confirmed with `git merge-base --is-ancestor main day9`).
+- Set slice status to InProgress in index.json and slice.json.
+- This time `myshifts/slice.json`'s screen entry already carries the real `pages` markup (patched
+  in by the revert commit) — a radio-select table (`<input type="radio">` per row, one disabled per
+  unclockable shift) with columns Shift/Type/Start/End/"Clock in opens", the last cell showing
+  either the opens-at time or a `tag is-light` "not yet". Rebuilt MyShifts.tsx to match this
+  structurally instead of the old held/free-style status tag column.
+- The "My shifts" screen title is shared with ClockIn/ClockOut (both still Planned/not rebuilt this
+  iteration) — per build-state-view Step 5 / build-state-change Step 6, a shared `src/pages/`
+  composition is only created "the first time a *second* slice on the same screen is built". Since
+  ClockIn/ClockOut aren't built yet, MyShifts stays a standalone component wired into App.tsx; the
+  page composition happens once ClockIn is rebuilt next.
+- Added real interactive selection state: `selectedShiftId` (useState) with a derived
+  `effectiveSelectedShiftId` computed at render time (falls back to the first clockable shift, and
+  is cleared if the previously selected shift becomes unclockable) — avoided a `setState`-in-`useEffect`
+  because oxlint's `react(set-state-in-effect)` flags that pattern; deriving during render satisfies
+  the same requirement (a shift is pre-selected/`is-selected` by default) without it.
+- Samples: sample-1 (clockable, spec 1) unchanged in shape; sample-2 now `clockable: false` (spec 2 —
+  radio disabled, "not yet" tag, no row pre-selected); sample-3 stays `[]` (spec 3 — empty state).
+- Verified all three visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock, cycling
+  VITE_MOCK_SAMPLE=1/2/3 with a dev-server restart each time since Vite only reads `.env` at
+  startup): sample-1 shows the early-shift row with its radio checked and "05:45" in Clock in opens;
+  sample-2 shows the same row with "not yet" and no checked radio; sample-3 shows "You have no
+  assigned shifts." Restored `.env` to `VITE_MOCK_SAMPLE=1` afterward.
+- npm run build and npm run lint both pass clean (lint was clean only after the render-time-derived
+  selection fix above — the original `useEffect` version produced an oxlint warning, though not a
+  hard failure).
+- Committed as "feat: [MyShifts]" and fast-forward merged into main.
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config).
+- **Learnings for future iterations:**
+  - `screens[].pages` is the actual blueprint and must be followed structurally, not just visually —
+    a passive "status tag per row" table and a "radio-select one row" table look similar at a glance
+    but imply different state (no selection vs. a `selectedShiftId`). When `pages` shows an
+    `<input type="radio">` per row, the component needs real selection state, not just a read-only
+    render of each row's own flag.
+  - Vite only reads `.env` once at process startup — changing `VITE_MOCK_SAMPLE` (or any `VITE_*`
+    var) requires restarting `npm run dev`, not just reloading the browser, for the new value to
+    take effect.
+  - Prefer deriving "which item is selected by default" during render (a plain expression, falling
+    back from state to a computed default) over `setState` inside a `useEffect` — oxlint's
+    `react(set-state-in-effect)` rule flags the latter, and the former is simpler besides.
+  - This confirms the AGENTS.md guidance added by the revert commit: when a screen's `pages` markup
+    exists, use it as the structural blueprint even without live board/mark access — no need to
+    fall back to a fields-only design once `pages` is present.
+---
