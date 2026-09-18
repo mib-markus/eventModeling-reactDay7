@@ -335,3 +335,45 @@
 - Branched feature/attendancehistory from main.
 - Set slice status to InProgress in index.json and slice.json.
 
+
+## 2026-09-18 - AttendanceHistory
+
+- Screen "My attendance" doesn't share its title with any other slice in
+  .build-kit/.slices/*/index.json -> built as a standalone component, no src/pages/
+  composition needed (unlike MyShifts/ClockIn/ClockOut's shared "My shifts" page).
+- Built src/slices/timetracking/employee/attendancehistory/AttendanceHistory.tsx (lane
+  "Employee" from slice.json screens[].lane) directly from the slice.json `pages` markup:
+  a month `<input type="month">` picker plus a "Hours worked this month" total in a
+  `level`, and a table of entries (Shift/Clocked in/Clocked out/Hours) below it - matches
+  the mockup structurally 1:1.
+- `month` is local component state (defaults to the current month via `new
+  Date().toISOString().slice(0,7)` when no `month` prop is passed), changing the picker
+  re-queries `day9_attendance_history` (readmodel.apiEndpoint verbatim) scoped to
+  employeeId+month via queryReadModel, same query-on-prop-change pattern as MyShifts.
+- `monthHoursWorked` is read off the first returned row (per slice.json's own note - "same
+  on every row") rather than summed client-side, since the read model already provides it
+  pre-aggregated per row.
+- A row with no `clockedOutAt`/`hoursWorked` (still open or forgotten clock-out) renders a
+  `tag is-warning` "missing" cell and an em-dash for hours, matching the mockup's
+  late-shift example row exactly.
+- Added 3 numbered samples: sample-1 (closed entry, 8h, spec 1), sample-2 (open entry, no
+  clock-out, 0 month total, spec 2), sample-3 (empty list - no attendance this month).
+- Verified all three visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock,
+  cycling VITE_MOCK_SAMPLE=1/2/3 with a dev-server restart each time): sample-1 shows the
+  early-shift row with 06:00/14:00 and "8.00" hours, total "8"; sample-2 shows "missing"/
+  "—" and total "0"; sample-3 shows "No attendance recorded for this month." No console
+  errors in any case. Restored .env to VITE_MOCK_SAMPLE=1 afterward.
+- npm run build and npm run lint both pass clean.
+- Committed as two scoped commits (metadata+progress, then feat: [AttendanceHistory] +
+  App.tsx wiring) and fast-forward merged feature/attendancehistory into main.
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config -
+  same as every prior iteration in this project).
+- **Learnings for future iterations:**
+  - Not every screen in a shared context is actually a shared page - check
+    `grep -l '"title": *"<ScreenTitle>"' .build-kit/.slices/*/index.json` before assuming
+    composition is needed; "My attendance" only appears once, so AttendanceHistory stayed
+    a plain standalone component wired straight into App.tsx.
+  - When a read model field's mapping explicitly says a value is "same on every row" (e.g.
+    monthHoursWorked here), read it off any one row rather than re-deriving/summing it
+    client-side - the read model already did that aggregation.
+---
