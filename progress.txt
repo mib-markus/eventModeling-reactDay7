@@ -328,3 +328,10 @@
     the same place that already owns the `openSession`/`selectedShift` coordination — never invented
     as an extra prop on the command component whose fields don't back it.
 ---
+## 2026-09-18 13:20 - AttendanceHistory (start)
+
+- Started iteration: context timetracking; AttendanceHistory (index 3, STATE_VIEW) is the only Planned slice; ClockOut already Done.
+- No board token -> skipped board sync (agentIds.BUILD only, no token/boardId/organizationId).
+- Branched feature/attendancehistory from main.
+- Set slice status to InProgress in index.json and slice.json.
+

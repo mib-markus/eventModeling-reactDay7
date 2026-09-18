@@ -2117,11 +2117,11 @@
       "contextName": "Time Tracking",
       "contextSlug": "timetracking",
       "folder": "attendancehistory",
-      "status": "Planned",
+      "status": "InProgress",
       "definition": {
         "id": "5829430f-4eb0-4e9c-a05a-dbc43d2fcf2e",
         "title": "AttendanceHistory",
-        "status": "Planned",
+        "status": "InProgress",
         "sliceType": "STATE_VIEW",
         "chapter": "Time Tracking",
         "context": "Time Tracking",
