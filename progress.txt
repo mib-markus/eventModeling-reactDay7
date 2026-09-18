@@ -263,3 +263,14 @@
     a `useState` the page itself owns — not a shared Context and not a cross-slice import. See the
     updated `.build-kit/AGENTS.md` entry for the general pattern.
 ---
+
+## 2026-09-18 - ClockOut (start)
+
+- Started iteration: context "timetracking" (Time Tracking). Planned slices: ClockOut (index 2,
+  STATE_CHANGE) and AttendanceHistory (index 3, STATE_VIEW) - both were flipped from "Created" to
+  "Planned" by an uncommitted board-sync edit already present in the working tree at iteration
+  start (not made by this iteration). Picked ClockOut as higher priority (lower index).
+- No `.build-kit/.eventmodelers/config.json` and `.eventmodelers/config.json` still has only
+  `agentIds.BUILD` -> skipped all board sync, consistent with every prior iteration.
+- Branched `feature/clockout` from `main`.
+- Set slice status to InProgress in index.json and slice.json.
