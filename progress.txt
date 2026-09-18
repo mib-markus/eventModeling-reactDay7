@@ -1,0 +1,44 @@
+## Codebase Patterns
+- TODO: an example of a your stack-specific reusable pattern once you have one
+
+## 2026-09-18 - CreateShift
+
+- Started iteration: context is "shiftmanagement" (Shift Management), only Planned slice is CreateShift (STATE_CHANGE).
+- No `.build-kit/.eventmodelers/config.json` present -> skipping board status sync (MCP/update-slice-status), working locally only.
+- Created branch feature/createshift from day8.
+- Set slice status to InProgress in index.json and slice.json.
+- No screen HTML node available (no eventmodelers board MCP/token configured in this project's
+  .eventmodelers/config.json — it only has agentIds, no token/board/org). Built the form from
+  slice.json fields alone, following the existing BlockTable.tsx Bulma pattern (columns/field/control).
+- Screen "Create shift" lane is "Manager" (from slice.json screens[].lane) -> path
+  src/slices/shiftmanagement/manager/createshift/CreateShift.tsx. No other slice in
+  .build-kit/.slices/*/index.json shares this screen title, so no src/pages/ composition needed;
+  wired directly into App.tsx like the day7 slices.
+- Business rules implemented client-side per specifications[]: recurring shift requires
+  fromDay+toDay (recurrence_days_missing), endDateTime must be after startDateTime
+  (end_before_start) - both block the submit button and show an inline warning. The
+  "shift_already_created" duplicate-id spec is a server-side invariant (this stack has no DB) -
+  surfaced generically via the existing ApiError/onError path used elsewhere in this codebase,
+  same as BlockTable's error handling.
+- shiftId defaults to crypto.randomUUID() when not passed as a prop (mirrors idAttribute:true
+  field with no dedicated screen input - it's an internal id, not user-entered per the screen).
+- Added samples/sample-1.json (recurring, from spec 1) and samples/sample-2.json (one-time, no
+  fromDay/toDay, from spec 2), wired sample-1 into App.tsx.
+- Verified visually via Playwright against `npm run dev` (VITE_DATA_MODE=mock): form renders with
+  sample-1 data, unchecking "Recurring shift" correctly hides From day/To day fields, submit
+  resolves via mock postCommand with no console errors.
+- npm run build and npm run lint both pass clean.
+- Committed as "feat: [CreateShift]" and fast-forward merged into main.
+- Set slice status to Done in index.json and slice.json (board sync skipped, no config).
+- **Learnings for future iterations:**
+  - This project currently has no `.eventmodelers` board token/org configured (only
+    `.eventmodelers/config.json` with `agentIds.BUILD`, no `token`/`boardId`/`organizationId`) -
+    every board-dependent step (screen HTML fetch, update-slice-status, comments) has nothing to
+    connect to. Treat this as expected per CLAUDE.md's "skip platform communication" rule rather
+    than trying to run the `connect` skill's interactive setup mid-iteration.
+  - Screen lane -> folder segment: `slice.json.screens[].lane` gives the lane directly without
+    needing a board fetch when the board isn't reachable; use it as `laneSlug` (lowercased,
+    hyphenated) same as the skill's Step 2 describes.
+  - datetime-local `<input>` is the natural fit for `DateTime` typed fields with `YYYY-MM-DDTHH:mm`
+    examples (matches slice.json's example format exactly, e.g. "2026-04-15T06:00").
+---

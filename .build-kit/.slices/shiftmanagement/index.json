@@ -1,1 +1,598 @@
-{ "slices": [] }
+{
+  "slices": [
+    {
+      "id": "a7a53fbd-bccd-4d88-88f4-14b457cba3a9",
+      "slice": "CreateShift",
+      "index": 0,
+      "contextName": "Shift Management",
+      "contextSlug": "shiftmanagement",
+      "folder": "createshift",
+      "status": "Done",
+      "definition": {
+        "id": "a7a53fbd-bccd-4d88-88f4-14b457cba3a9",
+        "title": "CreateShift",
+        "status": "Done",
+        "sliceType": "STATE_CHANGE",
+        "chapter": "Shift Management",
+        "context": "Shift Management",
+        "commands": [
+          {
+            "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+            "title": "CreateShift",
+            "type": "COMMAND",
+            "lane": "Interaction",
+            "slice": "CreateShift",
+            "apiEndpoint": "/api/day8/createshift/:shiftId",
+            "description": "A manager creates a shift by date and time range. The shift has a name, a type, and is either recurring (early-shift, Monday to Wednesday) or one-time (wedding-max-muster). One ShiftCreated is one shift definition - a recurring rule is stored as given and is not expanded into individual dated occurrences; see the Notes lane.",
+            "fields": [
+              {
+                "name": "shiftId",
+                "type": "UUID",
+                "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581",
+                "optional": false,
+                "idAttribute": true,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "name",
+                "type": "String",
+                "example": "early-shift",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "type",
+                "type": "String",
+                "example": "kitchen",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "recurring",
+                "type": "Boolean",
+                "example": "true",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "fromDay",
+                "type": "String",
+                "example": "Monday",
+                "optional": true,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "toDay",
+                "type": "String",
+                "example": "Wednesday",
+                "optional": true,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "startDateTime",
+                "type": "DateTime",
+                "example": "2026-04-15T06:00",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "endDateTime",
+                "type": "DateTime",
+                "example": "2026-04-15T14:00",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              }
+            ],
+            "dependencies": [
+              {
+                "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+                "type": "OUTBOUND",
+                "title": "ShiftCreated",
+                "elementType": "EVENT"
+              },
+              {
+                "id": "22921590-7b29-4bd3-9f9c-1d99bc32b64c",
+                "type": "INBOUND",
+                "title": "Create shift",
+                "elementType": "HTML_SCREEN"
+              }
+            ],
+            "comments": []
+          }
+        ],
+        "events": [
+          {
+            "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+            "title": "ShiftCreated",
+            "type": "EVENT",
+            "lane": "Swimlane",
+            "slice": "CreateShift",
+            "description": "A shift now exists and employees can be assigned to it. Carries the recurrence rule as the manager entered it.",
+            "fields": [
+              {
+                "name": "shiftId",
+                "type": "UUID",
+                "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581",
+                "optional": false,
+                "idAttribute": true,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "name",
+                "type": "String",
+                "example": "early-shift",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "type",
+                "type": "String",
+                "example": "kitchen",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "recurring",
+                "type": "Boolean",
+                "example": "true",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "fromDay",
+                "type": "String",
+                "example": "Monday",
+                "optional": true,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "toDay",
+                "type": "String",
+                "example": "Wednesday",
+                "optional": true,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "startDateTime",
+                "type": "DateTime",
+                "example": "2026-04-15T06:00",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              },
+              {
+                "name": "endDateTime",
+                "type": "DateTime",
+                "example": "2026-04-15T14:00",
+                "optional": false,
+                "idAttribute": false,
+                "cardinality": "Single",
+                "subfields": []
+              }
+            ],
+            "dependencies": [
+              {
+                "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+                "type": "INBOUND",
+                "title": "CreateShift",
+                "elementType": "COMMAND"
+              },
+              {
+                "id": "5a9e88d1-eb66-4144-bf04-5fbba797e348",
+                "type": "OUTBOUND",
+                "title": "ShiftList",
+                "elementType": "READMODEL"
+              },
+              {
+                "id": "57cf07f5-33d0-4060-a63f-5ddaf8aa8147",
+                "type": "OUTBOUND",
+                "title": "ShiftAssignments",
+                "elementType": "READMODEL"
+              },
+              {
+                "id": "e5a10073-6ffb-42d2-b9e6-7e5f80ec0337",
+                "type": "OUTBOUND",
+                "title": "ActiveShift",
+                "elementType": "READMODEL"
+              }
+            ],
+            "comments": []
+          }
+        ],
+        "readmodels": [],
+        "screens": [
+          {
+            "id": "22921590-7b29-4bd3-9f9c-1d99bc32b64c",
+            "title": "Create shift",
+            "type": "HTML_SCREEN",
+            "lane": "Manager",
+            "slice": "CreateShift",
+            "fields": []
+          }
+        ],
+        "processors": [],
+        "tables": [],
+        "specifications": [
+          {
+            "id": "ba000003-0000-4000-8000-000000000001",
+            "title": "A manager creates a recurring shift",
+            "given": [],
+            "when": [
+              {
+                "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+                "title": "CreateShift",
+                "type": "COMMAND",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+                  },
+                  {
+                    "name": "name",
+                    "example": "early-shift"
+                  },
+                  {
+                    "name": "type",
+                    "example": "kitchen"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "true"
+                  },
+                  {
+                    "name": "fromDay",
+                    "example": "Monday"
+                  },
+                  {
+                    "name": "toDay",
+                    "example": "Wednesday"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-15T06:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-15T14:00"
+                  }
+                ]
+              }
+            ],
+            "then": [
+              {
+                "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+                "title": "ShiftCreated",
+                "type": "EVENT",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+                  },
+                  {
+                    "name": "name",
+                    "example": "early-shift"
+                  },
+                  {
+                    "name": "type",
+                    "example": "kitchen"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "true"
+                  },
+                  {
+                    "name": "fromDay",
+                    "example": "Monday"
+                  },
+                  {
+                    "name": "toDay",
+                    "example": "Wednesday"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-15T06:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-15T14:00"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ba000003-0000-4000-8000-000000000002",
+            "title": "A manager creates a one-time shift, which carries no days",
+            "given": [],
+            "when": [
+              {
+                "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+                "title": "CreateShift",
+                "type": "COMMAND",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "8d2a7f30-6c15-4b98-a1e7-9b3f2c60d4aa"
+                  },
+                  {
+                    "name": "name",
+                    "example": "wedding-max-muster"
+                  },
+                  {
+                    "name": "type",
+                    "example": "service"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "false"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-18T16:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-19T01:00"
+                  }
+                ]
+              }
+            ],
+            "then": [
+              {
+                "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+                "title": "ShiftCreated",
+                "type": "EVENT",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "8d2a7f30-6c15-4b98-a1e7-9b3f2c60d4aa"
+                  },
+                  {
+                    "name": "name",
+                    "example": "wedding-max-muster"
+                  },
+                  {
+                    "name": "type",
+                    "example": "service"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "false"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-18T16:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-19T01:00"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "ba000003-0000-4000-8000-000000000003",
+            "title": "A shift cannot end before it starts",
+            "given": [],
+            "when": [
+              {
+                "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+                "title": "CreateShift",
+                "type": "COMMAND",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+                  },
+                  {
+                    "name": "name",
+                    "example": "early-shift"
+                  },
+                  {
+                    "name": "type",
+                    "example": "kitchen"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "false"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-15T14:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-15T06:00"
+                  }
+                ]
+              }
+            ],
+            "then": [
+              {
+                "id": "0ac62759-7bb4-4ad6-abf8-9ba2bfb4feae",
+                "title": "A shift cannot end before it starts",
+                "description": "end_before_start - endDateTime must be after startDateTime",
+                "type": "SPEC_ERROR",
+                "fields": []
+              }
+            ]
+          },
+          {
+            "id": "ba000003-0000-4000-8000-000000000004",
+            "title": "A recurring shift needs both a from day and a to day",
+            "given": [],
+            "when": [
+              {
+                "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+                "title": "CreateShift",
+                "type": "COMMAND",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+                  },
+                  {
+                    "name": "name",
+                    "example": "early-shift"
+                  },
+                  {
+                    "name": "type",
+                    "example": "kitchen"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "true"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-15T06:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-15T14:00"
+                  }
+                ]
+              }
+            ],
+            "then": [
+              {
+                "id": "d5223b30-8fab-4755-b516-ae867b9dbf91",
+                "title": "A recurring shift needs both a from day and a to day",
+                "description": "recurrence_days_missing - a recurring shift must carry fromDay and toDay",
+                "type": "SPEC_ERROR",
+                "fields": []
+              }
+            ]
+          },
+          {
+            "id": "ba000003-0000-4000-8000-000000000005",
+            "title": "The same shift cannot be created twice",
+            "given": [
+              {
+                "id": "2bb0634b-ae3e-4d5b-9070-a188ab7a30ee",
+                "title": "ShiftCreated",
+                "type": "EVENT",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+                  },
+                  {
+                    "name": "name",
+                    "example": "early-shift"
+                  },
+                  {
+                    "name": "type",
+                    "example": "kitchen"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "true"
+                  },
+                  {
+                    "name": "fromDay",
+                    "example": "Monday"
+                  },
+                  {
+                    "name": "toDay",
+                    "example": "Wednesday"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-15T06:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-15T14:00"
+                  }
+                ]
+              }
+            ],
+            "when": [
+              {
+                "id": "bbe56d72-dd37-4ba9-9547-d376f3f2a9df",
+                "title": "CreateShift",
+                "type": "COMMAND",
+                "fields": [
+                  {
+                    "name": "shiftId",
+                    "example": "3c8b1f04-5d72-4e19-9a6b-2f0c47ab5581"
+                  },
+                  {
+                    "name": "name",
+                    "example": "early-shift"
+                  },
+                  {
+                    "name": "type",
+                    "example": "kitchen"
+                  },
+                  {
+                    "name": "recurring",
+                    "example": "true"
+                  },
+                  {
+                    "name": "fromDay",
+                    "example": "Monday"
+                  },
+                  {
+                    "name": "toDay",
+                    "example": "Wednesday"
+                  },
+                  {
+                    "name": "startDateTime",
+                    "example": "2026-04-15T06:00"
+                  },
+                  {
+                    "name": "endDateTime",
+                    "example": "2026-04-15T14:00"
+                  }
+                ]
+              }
+            ],
+            "then": [
+              {
+                "id": "69cedab2-e969-416e-aeac-6d822cd5722c",
+                "title": "The same shift cannot be created twice",
+                "description": "shift_already_created - this shiftId already exists",
+                "type": "SPEC_ERROR",
+                "fields": []
+              }
+            ]
+          }
+        ],
+        "actors": [],
+        "aggregates": [],
+        "screenImages": [],
+        "comments": []
+      }
+    }
+  ]
+}
